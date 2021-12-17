@@ -8,6 +8,7 @@ namespace d2Doses1
 
 	public:
 		container* container;
+
 	}DEFAULTS;
 
 	class container
