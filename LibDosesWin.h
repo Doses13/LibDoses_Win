@@ -2,7 +2,10 @@
 #include <windows.h>	// Normal windows stuff
 #include <windowsx.h>	// More windows stuff
 #include <d2d1.h>		// Direct 2D
+#include <dwrite.h>		// Direct 2D text rendering
 #include <d3d12.h>		// Direct 3D 12
+#pragma comment(lib, "d2d1")
+#pragma comment(lib, "dwrite")
 
 // Made by me
 #include "LibDoses.h"		// includes normal LibDoses
