@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClInclude Include="d2Doses1.h" />
     <ClInclude Include="LibDosesWin.h" />
+    <ClInclude Include="ProgObjects.h" />
     <ClInclude Include="ProgWindows.h" />
     <ClInclude Include="windoses.h" />
   </ItemGroup>
@@ -157,6 +158,9 @@
     </ClCompile>
     <ClCompile Include="Main(scaffold).cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="ProgObjects.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="ProgWindows.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

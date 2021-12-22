@@ -170,6 +170,8 @@ public:
 
     HWND Handle() const { return m_hwnd; }
 
+
+
 protected:
 
     virtual PCWSTR ClassName() const
@@ -205,15 +207,15 @@ protected:
             OnPaint_Base();
             return 0;
         case WM_SIZE:
-            Resize();
+            OnResize();
             return 0;
         }
-        return HandleMessage(uMsg, wParam, lParam);
+        return MKEventSystem(uMsg, wParam, lParam);
     }
     virtual HRESULT CreateGraphicsResources_Base()
     {
         HRESULT hr = S_OK;
-        if (pRenderTarget == NULL)
+        if (!m_pRenderTarget)
         {
             RECT rc;
             GetClientRect(m_hwnd, &rc);
@@ -223,10 +225,11 @@ protected:
             hr = pFactory->CreateHwndRenderTarget(
                 D2D1::RenderTargetProperties(),
                 D2D1::HwndRenderTargetProperties(m_hwnd, size),
-                &pRenderTarget);
+                &m_pRenderTarget);
 
             if (SUCCEEDED(hr))
             {
+                m_con.create(m_pRenderTarget);      // The default container is created
                 hr = CreateGraphicsResources();     // User function
                 if (SUCCEEDED(hr))
                 {
@@ -238,12 +241,12 @@ protected:
     }
     virtual void DiscardGraphicsResources_Base()
     {
-        SafeRelease(&pRenderTarget);
+        SafeRelease(&m_pRenderTarget);
         DiscardGraphicsResources();     // User function
     }
     virtual void CalculateLayout_Base()
     {
-        if (pRenderTarget) CalculateLayout();   // User function
+        if (m_pRenderTarget) CalculateLayout();   // User function
     }
     virtual void OnPaint_Base()
     {
@@ -253,12 +256,12 @@ protected:
             PAINTSTRUCT ps;
             BeginPaint(m_hwnd, &ps);
 
-            pRenderTarget->BeginDraw();
-            pRenderTarget->Clear({ 0.1f,0.1f,0.1f,1 });
+            m_pRenderTarget->BeginDraw();
+            m_pRenderTarget->Clear({ 0.1f,0.1f,0.1f,1 });
 
-            OnPaint();      // User funciton
+            hr = OnPaint();      // User funciton
 
-            hr = pRenderTarget->EndDraw();
+            hr = m_pRenderTarget->EndDraw();
             if (FAILED(hr) || hr == D2DERR_RECREATE_TARGET)
             {
                 DiscardGraphicsResources_Base();
@@ -266,19 +269,23 @@ protected:
             EndPaint(m_hwnd, &ps);
         }
     }
-    virtual void Resize()
+    virtual void OnResize()
     {
-        if (pRenderTarget)
+        if (m_pRenderTarget)
         {
             RECT rc;
             GetClientRect(m_hwnd, &rc);
 
             D2D1_SIZE_U size = D2D1::SizeU(rc.right, rc.bottom);
 
-            pRenderTarget->Resize(size);
+            m_pRenderTarget->Resize(size);
             CalculateLayout_Base();
             InvalidateRect(m_hwnd, NULL, FALSE);
         }
+    }
+    virtual void OnDestroy_Base()
+    {
+        PostQuitMessage(0);
     }
 
     // Optional user definitions to extend base functions
@@ -287,13 +294,26 @@ protected:
     virtual HRESULT CreateGraphicsResources() { return S_OK; };
     virtual void DiscardGraphicsResources() {};
     virtual void CalculateLayout() {};
-    virtual void OnPaint() {};
+    virtual HRESULT OnPaint() { return S_OK;  };
+    virtual void OnDestroy() {};
+
+    HRESULT MKEventSystem(UINT uMsg, WPARAM wParam, LPARAM lParam);     // Mouse and keyboard event system
+                                                                        // Automatically distributes mouse and keyboard input to the correct objects
 
     HWND m_hwnd;
     const wchar_t* m_ClassName = L"Class Name";
+
+    // D2D stuff
     ID2D1Factory* pFactory = NULL;
     IDWriteFactory* pDWriteFactory_ = NULL;
-    ID2D1HwndRenderTarget* pRenderTarget = NULL;
+    ID2D1HwndRenderTarget* m_pRenderTarget = NULL;
+
+    // My D2D stuff
+    container m_con;
+
+private:
+    MKEvent m_lastEvent;            // Do I actually need this
+    object* m_lastObject = nullptr; // Used for hover on / off
 };
 
 //D3D12Window to come
