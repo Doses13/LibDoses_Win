@@ -49,6 +49,17 @@ namespace d2Doses1
 		keyEvent keys;
 	};
 
+	static class ERRORS
+	{
+		friend class brush;
+		bool creatingBrush = 0;
+		bool noRenderTarget = 0;
+	public:
+		void clearErrors() { creatingBrush = 0; };
+		bool errorCreatingBrush() { return creatingBrush; };
+		bool errorNoRenderTarget() { return noRenderTarget; };
+	}ERRORS;
+
 	// Brush classes
 	class brush
 	{
@@ -57,7 +68,7 @@ namespace d2Doses1
 		brushType m_type = brushType::solid;
 	public:
 		brush();											// Default
-		virtual ID2D1Brush* getPtr();						// Gets the 2d2 brush pointer
+		ID2D1Brush* getPtr();						// Gets the 2d2 brush pointer
 		virtual HRESULT create(ID2D1HwndRenderTarget*) = 0;	// Gets a value for the pointer		
 	};
 
@@ -69,6 +80,8 @@ namespace d2Doses1
 		solidBrush(unsigned int RGB = 0xff0070, float Alpha = 1.0f);		// Init with an rgb number
 		ID2D1SolidColorBrush* getPtr();										// Returns the d2d brush pointer as a solid color brush
 		HRESULT create(ID2D1HwndRenderTarget*) override;					// Gets a value for the pointer
+		void setColor(D2D1_COLOR_F Color);
+		void setColor(unsigned int Color);
 	};
 	class linearBrush : brush
 	{
@@ -131,14 +144,23 @@ namespace d2Doses1
 		// Brushes
 		brushType m_useBrush = brushType::solid;
 		brush* m_brush = nullptr;
+		
 
 	protected:
 		object(objectType Type = objectType::rect);	// Init with object type
+		object(solidBrush* Brush, objectType Type = objectType::rect);
+		object(linearBrush* Brush, objectType Type = objectType::rect);
+		object(radialBrush* Brush, objectType Type = objectType::rect);
+		object(bitmapBrush* Brush, objectType Type = objectType::rect);
 		
 	public:
 		// brush stuff
 		brushType getBrushType() { return m_useBrush; };
 		brush* getBrush();
+		solidBrush* getSolidBrush();
+		linearBrush* getLinearBrush();
+		radialBrush* getRadialBrush();
+		bitmapBrush* getBitmapBrush();
 
 		// Virtuals
 		virtual void move(float X, float Y) = 0;			// Moves the object on the screen relative to its current position
@@ -169,6 +191,10 @@ namespace d2Doses1
 
 	public:
 		rect(float X = 75, float Y = 75, float W = 100, float H = 100);
+		rect(solidBrush* Brush, float X = 75, float Y = 75, float W = 100, float H = 100);
+		rect(linearBrush* Brush, float X = 75, float Y = 75, float W = 100, float H = 100);
+		rect(radialBrush* Brush, float X = 75, float Y = 75, float W = 100, float H = 100);
+		rect(bitmapBrush* Brush, float X = 75, float Y = 75, float W = 100, float H = 100);
 
 		void move(float X, float Y) override;
 		void setPos(float X, float Y) override;
@@ -176,6 +202,8 @@ namespace d2Doses1
 		HRESULT render(ID2D1HwndRenderTarget* pRenderTarget) override;
 
 	};
+
+	
 }
 
 #include "d2Doses1.cpp"

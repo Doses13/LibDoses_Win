@@ -1,28 +1,65 @@
+// Button1
 HRESULT button1::EventFunction(MKEvent Event)
 {
-	if (Event.button == mouseEvent::leftUp)
+	switch (Event.button)
 	{
-		swap();
+	case mouseEvent::leftUp:
+		if (m_depressed)
+		{
+			move(0, -2);
+			swap();
+			m_depressed = 0;
+		}
+		break;
+	case mouseEvent::leftDown:
+		getSolidBrush()->setColor(m_depressedColor);
+		move(0, 2);
+		m_depressed = 1;
+		break;
+	case mouseEvent::hoverOn:
+		if (m_active)
+		{
+			getSolidBrush()->setColor(m_onHoverColor);
+		}
+		else
+		{
+			getSolidBrush()->setColor(m_offHoverColor);
+		}
+		break;
+	case mouseEvent::hoverOff:
+		if (m_active)
+		{
+			getSolidBrush()->setColor(m_onColor);
+		}
+		else
+		{
+			getSolidBrush()->setColor(m_offColor);
+		}
+		if (m_depressed)
+		{
+			move(0, -2);
+			m_depressed = 0;
+		}
+		break;
+	default:
+		break;
 	}
 	return S_OK;
 }
-
 void button1::swap()
 {
 	if (m_active) // now make button in-active
 	{
-		m_sb->SetColor(D2D1::ColorF(m_offColor));
+		getSolidBrush()->setColor(m_offColor);
 		m_active = false;
 	}
 	else // make button active
 	{
-		m_sb->SetColor(D2D1::ColorF(m_onColor));
+		getSolidBrush()->setColor(m_onColor);
 		m_active = true;
 	}
 }
-
-button1::button1()
+button1::button1(float X, float Y) : rect(X,Y,50,40)
 {
-	m_sb = reinterpret_cast<ID2D1SolidColorBrush*>(getBrush()->getPtr());
-	m_sb->SetColor(D2D1::ColorF(m_offColor));
+	getSolidBrush()->setColor(m_offColor);
 }

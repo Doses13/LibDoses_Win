@@ -36,6 +36,43 @@ public:
 float DPIScale::scaleX = 1.0f;
 float DPIScale::scaleY = 1.0f;
 
+static class DEBUG_CONSOLE_D2D
+{
+    ID2D1HwndRenderTarget* m_pRT = nullptr;
+    IDWriteFactory* m_pWF = nullptr;
+
+    IDWriteTextFormat* m_WTF = nullptr;
+    ID2D1SolidColorBrush* m_pSB = nullptr;
+
+    D2D1_RECT_F m_rect;
+    const wchar_t* m_logText = L"";
+    bool m_displayLog = 1;
+
+public:
+    HRESULT create(ID2D1HwndRenderTarget* pRT, IDWriteFactory* pWF)
+    {
+        HRESULT hr = S_OK;
+        m_pRT = pRT;
+        m_pWF = pWF;
+        hr = m_pWF->CreateTextFormat(L"Arial", NULL, DWRITE_FONT_WEIGHT_NORMAL,
+            DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 12, L"Arial", &m_WTF);
+        hr = m_pRT->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::LightGreen), &m_pSB);
+        m_rect.right = 200;
+        return hr;
+    }
+    void startLogging();
+    void stopLogging();
+    void clearLog();
+    void display()
+    {
+        m_pRT->DrawTextW(m_logText, wcslen(m_logText), m_WTF, m_rect, m_pSB);
+    }
+    void log(const wchar_t* Log)
+    {
+        m_logText = Log;
+    }
+}DC;
+
 // BASE WINDOW CLASSES
 
 template <class DERIVED_TYPE>
@@ -170,8 +207,6 @@ public:
 
     HWND Handle() const { return m_hwnd; }
 
-
-
 protected:
 
     virtual PCWSTR ClassName() const
@@ -227,6 +262,8 @@ protected:
                 D2D1::HwndRenderTargetProperties(m_hwnd, size),
                 &m_pRenderTarget);
 
+            DC.create(m_pRenderTarget, pDWriteFactory_);
+
             if (SUCCEEDED(hr))
             {
                 m_con.create(m_pRenderTarget);      // The default container is created
@@ -258,6 +295,8 @@ protected:
 
             m_pRenderTarget->BeginDraw();
             m_pRenderTarget->Clear({ 0.1f,0.1f,0.1f,1 });
+
+            DC.display();
 
             hr = OnPaint();      // User funciton
 
