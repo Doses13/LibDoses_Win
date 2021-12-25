@@ -50,12 +50,12 @@ void button1::swap()
 {
 	if (m_active) // now make button in-active
 	{
-		getSolidBrush()->setColor(m_offColor);
+		getSolidBrush()->setColor(m_offHoverColor);
 		m_active = false;
 	}
 	else // make button active
 	{
-		getSolidBrush()->setColor(m_onColor);
+		getSolidBrush()->setColor(m_onHoverColor);
 		m_active = true;
 	}
 }

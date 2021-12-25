@@ -2,6 +2,8 @@
 #pragma once
 
 #include "LibDosesWin.h"
+#include <string>
+#include <iostream>
 
 // RANDOM THINGS
 
@@ -38,6 +40,9 @@ float DPIScale::scaleY = 1.0f;
 
 static class DEBUG_CONSOLE_D2D
 {
+    friend DEBUG_CONSOLE_D2D& operator<<(DEBUG_CONSOLE_D2D& dc, const wchar_t* rhs);
+    friend DEBUG_CONSOLE_D2D& operator<<(DEBUG_CONSOLE_D2D& dc, const int& rhs);
+
     ID2D1HwndRenderTarget* m_pRT = nullptr;
     IDWriteFactory* m_pWF = nullptr;
 
@@ -45,8 +50,9 @@ static class DEBUG_CONSOLE_D2D
     ID2D1SolidColorBrush* m_pSB = nullptr;
 
     D2D1_RECT_F m_rect;
-    const wchar_t* m_logText = L"";
+    std::wstring m_text;
     bool m_displayLog = 1;
+    bool m_acceptNew = 1;
 
 public:
     HRESULT create(ID2D1HwndRenderTarget* pRT, IDWriteFactory* pWF)
@@ -63,15 +69,38 @@ public:
     void startLogging();
     void stopLogging();
     void clearLog();
+    const wchar_t* getLog()
+    {
+        return m_text.c_str();
+    }
     void display()
     {
-        m_pRT->DrawTextW(m_logText, wcslen(m_logText), m_WTF, m_rect, m_pSB);
-    }
-    void log(const wchar_t* Log)
-    {
-        m_logText = Log;
+        m_pRT->DrawTextW(m_text.c_str(), m_text.size(), m_WTF, m_rect, m_pSB);
+        m_text.clear();
     }
 }DC;
+
+// overloads of << for debug log
+DEBUG_CONSOLE_D2D& operator<<(DEBUG_CONSOLE_D2D& dc, const wchar_t* rhs)
+{
+    if (&dc)
+    {
+        dc.m_text.append(rhs);
+        if (dc.m_pRT) {
+            InvalidateRect(dc.m_pRT->GetHwnd(), NULL, FALSE);
+        }
+    }    
+    return dc;
+}
+
+DEBUG_CONSOLE_D2D& operator<<(DEBUG_CONSOLE_D2D& dc, const int& rhs)
+{
+    dc.m_text.append(std::to_wstring(rhs));
+    if (dc.m_pRT) {
+        InvalidateRect(dc.m_pRT->GetHwnd(), NULL, FALSE);
+    }
+    return dc;
+}
 
 // BASE WINDOW CLASSES
 
@@ -216,6 +245,7 @@ protected:
 
     virtual LRESULT HandleMessage_Base(UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
+        static bool destroyed = 0;
         switch (uMsg)
         {
         case WM_CREATE:
@@ -237,6 +267,7 @@ protected:
             DiscardGraphicsResources_Base();
             SafeRelease(&pFactory);
             PostQuitMessage(0);
+            destroyed = 1;
             return 0;
         case WM_PAINT:
             OnPaint_Base();
@@ -245,7 +276,10 @@ protected:
             OnResize();
             return 0;
         }
-        return MKEventSystem(uMsg, wParam, lParam);
+        if (!destroyed)
+        {
+            return MKEventSystem(uMsg, wParam, lParam);
+        }
     }
     virtual HRESULT CreateGraphicsResources_Base()
     {

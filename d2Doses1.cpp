@@ -235,4 +235,5 @@ HRESULT rect::render(ID2D1HwndRenderTarget* pRenderTarget)
 			pRenderTarget->DrawRectangle(m_rect, getBrush()->getPtr(), m_weight);
 		}
 	}
+	return hr;
 }
