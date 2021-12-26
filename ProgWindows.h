@@ -15,7 +15,7 @@ class MainWindow : public D2DWindow<MainWindow>
 	//button1 b4;
 
 public:
-	MainWindow() : b1(100,100), b2(130,110), b3(300,100)
+	MainWindow() : b1(100,100), b2(160,100), b3(220,100)
 	{	
 		
 	};

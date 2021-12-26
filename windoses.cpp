@@ -26,6 +26,11 @@ HRESULT D2DWindow<USER_CLASS>::MKEventSystem(UINT uMsg, WPARAM wParam, LPARAM lP
 					m_lastObject->EventFunction(e);			// runs hoverOff for last object
 				}
 			}
+			else	// Mouse moved on the same object
+			{
+				e.button = mouseEvent::move;
+				obj->EventFunction(e);
+			}
 		}
 		else if (m_lastObject)
 		{

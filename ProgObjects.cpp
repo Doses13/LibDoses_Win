@@ -10,8 +10,10 @@ HRESULT button1::EventFunction(MKEvent Event)
 			swap();
 			m_depressed = 0;
 		}
+		m_dragging = 0;
 		break;
 	case mouseEvent::leftDown:
+		m_dragStart = Event.cords;
 		getSolidBrush()->setColor(m_depressedColor);
 		move(0, 2);
 		m_depressed = 1;
@@ -40,7 +42,22 @@ HRESULT button1::EventFunction(MKEvent Event)
 			move(0, -2);
 			m_depressed = 0;
 		}
+		m_dragging = 0;
 		break;
+	case mouseEvent::move:
+		if (m_depressed && distance(Event.cords, m_dragStart) > m_dragThreshhold)
+		{
+			// hover off
+			MKEvent t;
+			t.button = mouseEvent::hoverOff;
+			EventFunction(t);
+
+			m_dragging = 1;
+		}
+		if (m_dragging)
+		{
+			setPos(Event.cords.x, Event.cords.y);
+		}
 	default:
 		break;
 	}

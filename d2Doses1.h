@@ -3,6 +3,11 @@
 
 namespace d2Doses1
 {
+	// Useful functions
+	double distance(D2D1_POINT_2F p1, D2D1_POINT_2F p2);
+	double distance(D2D1_POINT_2L p1, D2D1_POINT_2L p2);
+	double distance(double x1, double y1, double x2, double y2);
+
 	// Pre Definitions
 	class container;
 	class object;
@@ -137,6 +142,7 @@ namespace d2Doses1
 		static unsigned sm_count;		// Increment every time an object is made
 		const int m_id;					// Each object gets and id when created
 		objectType m_type;				// What type the object is
+		container* m_container;			// The container that the object belongs to
 		object* m_parent;				// The parent of the object
 		dynArray<object*> m_children;	// The children of the object
 		bool m_enebled = 1;				// Is the object enabled
@@ -154,6 +160,10 @@ namespace d2Doses1
 		object(bitmapBrush* Brush, objectType Type = objectType::rect);
 		
 	public:
+
+		container* setContainer(container* Con);
+		container* getContainer();
+
 		// brush stuff
 		brushType getBrushType() { return m_useBrush; };
 		brush* getBrush();

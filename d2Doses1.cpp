@@ -1,3 +1,4 @@
+#include "d2Doses1.h"
 using namespace d2Doses1;
 using namespace D2D1;
 
@@ -63,6 +64,7 @@ void container::create(ID2D1HwndRenderTarget* pRT)
 int container::add(object* newObject)
 {
 	m_objs.push_back(newObject);
+	newObject->setContainer(this);
 	return m_objs.size() - 1;
 }
 int container::size()
@@ -104,6 +106,21 @@ object::object(objectType Type) : m_id(sm_count), m_type(Type), m_parent(nullptr
 	DEFAULTS.container->add(this);
 	m_brush = new solidBrush;
 }
+container* object::setContainer(container* Con)
+{
+	container* t = m_container;
+	if (Con)
+	{
+		m_container = Con;
+	}
+	return t;
+}
+container* object::getContainer()
+{
+	return m_container;
+}
+
+// Brushs
 brush* object::getBrush()
 {
 	return m_brush;
@@ -179,13 +196,16 @@ void rect::setPos(float X, float Y)
 {
 	if (m_lockedBounds)
 	{
-		m_bounds.top = m_rect.top = Y;
-		m_bounds.bottom = m_rect.bottom = Y;
-		m_bounds.left = m_rect.left = X;
-		m_bounds.right = m_rect.right = X;
-
 		m_originX = X;
 		m_originY = Y;
+		
+		float w = abs(m_rect.right - m_rect.left);
+		float h = abs(m_rect.bottom - m_rect.top);
+
+		m_bounds.top = m_rect.top = Y - (h / 2);
+		m_bounds.bottom = m_rect.bottom = Y + (h / 2);
+		m_bounds.left = m_rect.left = X - (w / 2);
+		m_bounds.right = m_rect.right = X + (w / 2);
 	}
 	else
 	{
@@ -236,4 +256,25 @@ HRESULT rect::render(ID2D1HwndRenderTarget* pRenderTarget)
 		}
 	}
 	return hr;
+}
+
+// Useful funcions
+
+double d2Doses1::distance(D2D1_POINT_2F p1, D2D1_POINT_2F p2)
+{
+	double x = p2.x - p1.x;
+	double y = p2.y - p1.y;
+	return x * x + y * y;
+}
+double d2Doses1::distance(D2D1_POINT_2L p1, D2D1_POINT_2L p2)
+{
+	double x = p2.x - p1.x;
+	double y = p2.y - p1.y;
+	return x * x + y * y;
+}
+double d2Doses1::distance(double x1, double y1, double x2, double y2)
+{
+	double x = x2 - x1;
+	double y = y2 - y1;
+	return x * x + y * y;
 }
