@@ -1,11 +1,21 @@
 // Button1
+
+dynArray<button1*> button1::sm_allButtons;
+bool button1::sm_onlyOne = 1;
+
 HRESULT button1::EventFunction(MKEvent Event)
 {
 	switch (Event.button)
 	{
 	case mouseEvent::leftUp:
+		getContainer()->setCapture(nullptr);
+		if (sm_onlyOne)
+		{
+			turnOffAllOthers(this);
+		}
 		if (m_depressed)
 		{
+			
 			move(0, -2);
 			swap();
 			m_depressed = 0;
@@ -13,6 +23,7 @@ HRESULT button1::EventFunction(MKEvent Event)
 		m_dragging = 0;
 		break;
 	case mouseEvent::leftDown:
+		getContainer()->setCapture(this);
 		m_dragStart = Event.cords;
 		getSolidBrush()->setColor(m_depressedColor);
 		move(0, 2);
@@ -76,7 +87,32 @@ void button1::swap()
 		m_active = true;
 	}
 }
+void button1::turnOffAllOthers(button1* exception)
+{
+	for (int i = 0; i < sm_allButtons.size(); i++)
+	{
+		if (sm_allButtons[i] != exception)
+		{
+			sm_allButtons[i]->setStatus(false);
+		}
+	}
+}
+void button1::setStatus(bool set)
+{
+	if (m_active && !set)		// will turn the object off
+	{
+		getSolidBrush()->setColor(m_offColor);
+		m_active = 0;
+	}
+	else if (!m_active && set)	// will turn the object on
+	{
+		getSolidBrush()->setColor(m_onColor);
+		m_active = 1;
+	}
+}
+
 button1::button1(float X, float Y) : rect(X,Y,50,40)
 {
 	getSolidBrush()->setColor(m_offColor);
+	sm_allButtons.push_back(this);
 }

@@ -87,6 +87,15 @@ object* container::operator[](int Index)
 {
 	return m_objs[Index];
 }
+void container::setCapture(object* obj)
+{
+	m_captured = obj;
+}
+object* container::getCapture()
+{
+	return m_captured;
+}
+
 HRESULT container::render()
 {
 	for (int i = 0; i < m_objs.size(); i++)
@@ -264,17 +273,17 @@ double d2Doses1::distance(D2D1_POINT_2F p1, D2D1_POINT_2F p2)
 {
 	double x = p2.x - p1.x;
 	double y = p2.y - p1.y;
-	return x * x + y * y;
+	return sqrt(x * x + y * y);
 }
 double d2Doses1::distance(D2D1_POINT_2L p1, D2D1_POINT_2L p2)
 {
 	double x = p2.x - p1.x;
 	double y = p2.y - p1.y;
-	return x * x + y * y;
+	return sqrt(x * x + y * y);
 }
 double d2Doses1::distance(double x1, double y1, double x2, double y2)
 {
 	double x = x2 - x1;
 	double y = y2 - y1;
-	return x * x + y * y;
+	return (x * x + y * y);
 }

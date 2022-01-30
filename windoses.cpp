@@ -4,39 +4,53 @@ HRESULT D2DWindow<USER_CLASS>::MKEventSystem(UINT uMsg, WPARAM wParam, LPARAM lP
 	MKEvent e;
 	object* obj = nullptr;
 
+	//DC << uMsg << nll;
+
 	switch (uMsg)
 	{
 	case WM_MOUSEMOVE:
 	{
-		InvalidateRect(m_hwnd, NULL, FALSE);			// tells the window to redraw
 		e.cords.x = GET_X_LPARAM(lParam);
 		e.cords.y = GET_Y_LPARAM(lParam);
-		obj = m_con.getObjAtCord(e.cords.x, e.cords.y);	// gets what object is under the pointer now
-		DC << L"Current: " << (int)obj << L"\n" << L"Last: " << (int)m_lastObject << L"\n";
-		DC << e.cords.x << L", " << e.cords.y << L"\n";
-		if (obj)
+		if (m_con.getCapture())
 		{
-			if (obj != m_lastObject)						// if mouse is on a new object
+			InvalidateRect(m_hwnd, NULL, FALSE);			// tells the window to redraw
+			e.button = mouseEvent::move;
+			m_con.getCapture()->EventFunction(e);
+		}
+		else
+		{
+			obj = m_con.getObjAtCord(e.cords.x, e.cords.y);	// gets what object is under the pointer now
+			if (obj)
 			{
-				e.button = mouseEvent::hoverOn;
-				obj->EventFunction(e);						// Runs hoverOn for new object
-				if (m_lastObject)
+				InvalidateRect(m_hwnd, NULL, FALSE);			// tells the window to redraw
+				if (obj != m_lastObject)						// if mouse is on a new object
 				{
-					e.button = mouseEvent::hoverOff;
-					m_lastObject->EventFunction(e);			// runs hoverOff for last object
+					e.button = mouseEvent::hoverOn;
+					obj->EventFunction(e);						// Runs hoverOn for new object
+					if (m_lastObject)
+					{
+						e.button = mouseEvent::hoverOff;
+						m_lastObject->EventFunction(e);			// runs hoverOff for last object
+					}
+				}
+				else	// Mouse moved on the same object
+				{
+					e.button = mouseEvent::move;
+					obj->EventFunction(e);
 				}
 			}
-			else	// Mouse moved on the same object
+			else if (m_lastObject)
 			{
-				e.button = mouseEvent::move;
-				obj->EventFunction(e);
+				InvalidateRect(m_hwnd, NULL, FALSE);			// tells the window to redraw
+				e.button = mouseEvent::hoverOff;
+				m_lastObject->EventFunction(e);
 			}
 		}
-		else if (m_lastObject)
-		{
-			e.button = mouseEvent::hoverOff;
-			m_lastObject->EventFunction(e);
-		}
+
+		//DC << L"Current: " << (int)obj << L"\n" << L"Last: " << (int)m_lastObject << L"\n";
+		//DC << e.cords.x << L", " << e.cords.y << L"\n";
+
 		m_lastObject = obj;
 		return 0;
 	}
@@ -45,8 +59,8 @@ HRESULT D2DWindow<USER_CLASS>::MKEventSystem(UINT uMsg, WPARAM wParam, LPARAM lP
 		e.cords.x = GET_X_LPARAM(lParam);
 		e.cords.y = GET_Y_LPARAM(lParam);
 		obj = m_con.getObjAtCord(e.cords.x, e.cords.y);
-		DC << L"Current: " << (int)obj << L"\n" << L"Last: " << (int)m_lastObject << L"\n";
-		DC << e.cords.x << L", " << e.cords.y << L"\n";
+		//DC << L"Current: " << (int)obj << L"\n" << L"Last: " << (int)m_lastObject << L"\n";
+		//DC << e.cords.x << L", " << e.cords.y << L"\n";
 		e.button = mouseEvent::leftDown;
 		if (obj)
 		{
@@ -60,8 +74,8 @@ HRESULT D2DWindow<USER_CLASS>::MKEventSystem(UINT uMsg, WPARAM wParam, LPARAM lP
 		e.cords.x = GET_X_LPARAM(lParam);
 		e.cords.y = GET_Y_LPARAM(lParam);
 		obj = m_con.getObjAtCord(e.cords.x, e.cords.y);
-		DC << L"Current: " << (int)obj << L"\n" << L"Last: " << (int)m_lastObject << L"\n";
-		DC << e.cords.x << L", " << e.cords.y << L"\n";
+		//DC << L"Current: " << (int)obj << L"\n" << L"Last: " << (int)m_lastObject << L"\n";
+		//DC << e.cords.x << L", " << e.cords.y << L"\n";
 		e.button = mouseEvent::leftUp;
 		if (obj) 
 		{ 

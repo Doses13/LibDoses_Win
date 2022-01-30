@@ -5,6 +5,8 @@
 #include <string>
 #include <iostream>
 
+#define nll L"\n"
+
 // RANDOM THINGS
 
 template <class T> void SafeRelease(T** ppT)
@@ -83,22 +85,13 @@ public:
 // overloads of << for debug log
 DEBUG_CONSOLE_D2D& operator<<(DEBUG_CONSOLE_D2D& dc, const wchar_t* rhs)
 {
-    if (&dc)
-    {
-        dc.m_text.append(rhs);
-        if (dc.m_pRT) {
-            InvalidateRect(dc.m_pRT->GetHwnd(), NULL, FALSE);
-        }
-    }    
+    dc.m_text.append(rhs);
     return dc;
 }
 
 DEBUG_CONSOLE_D2D& operator<<(DEBUG_CONSOLE_D2D& dc, const int& rhs)
 {
     dc.m_text.append(std::to_wstring(rhs));
-    if (dc.m_pRT) {
-        InvalidateRect(dc.m_pRT->GetHwnd(), NULL, FALSE);
-    }
     return dc;
 }
 
@@ -183,6 +176,8 @@ public:
     static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
         USER_CLASS* pThis = NULL;
+
+        DC << uMsg << nll;
 
         if (uMsg == WM_NCCREATE)
         {

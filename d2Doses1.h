@@ -120,6 +120,7 @@ namespace d2Doses1
 	{
 		dynArray<object*> m_objs;
 		ID2D1HwndRenderTarget* m_pRT;
+		object* m_captured;
 	public:
 		// tors
 		container();									
@@ -132,6 +133,8 @@ namespace d2Doses1
 		object* operator[](int Index);								// Returns the object in that position of the array
 		object* getObjAtCord(int X, int Y);							// returns what object is at those cordinates
 		ID2D1HwndRenderTarget* getRenderTarget() { return m_pRT; };	// Gets the render target in the container
+		void setCapture(object* obj);								// Makes an object always update
+		object* getCapture();										// Returns the captured object
 		HRESULT render();											// Renders all stored objects
 		void discard();												// *To be ran in discardResources*
 	};
@@ -177,7 +180,8 @@ namespace d2Doses1
 		virtual void setPos(float X, float Y) = 0;			// Moves the object to a position relative to the window
 		virtual bool inBounds(int X, int Y) { return 0; };	// Returns if the object is in a position
 		virtual HRESULT render(ID2D1HwndRenderTarget* pRenderTarget) = 0;	// puts the object on the screen
-		virtual HRESULT EventFunction(MKEvent) { return S_OK; };				// Runs the Event system function
+		virtual HRESULT EventFunction(MKEvent) { return S_OK; };
+		// Runs the Event system function
 	};
 	unsigned object::sm_count = 0;
 
