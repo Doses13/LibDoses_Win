@@ -299,7 +299,7 @@ protected:
                 hr = CreateGraphicsResources();     // User function
                 if (SUCCEEDED(hr))
                 {
-                    CalculateLayout_Base();
+                    CalculateLayout_Base(size);
                 }
             }
         }
@@ -310,9 +310,9 @@ protected:
         SafeRelease(&m_pRenderTarget);
         DiscardGraphicsResources();     // User function
     }
-    virtual void CalculateLayout_Base()
+    virtual void CalculateLayout_Base(D2D1_SIZE_U size)
     {
-        if (m_pRenderTarget) CalculateLayout();   // User function
+        if (m_pRenderTarget) CalculateLayout(size);   // User function
     }
     virtual void OnPaint_Base()
     {
@@ -345,9 +345,9 @@ protected:
             GetClientRect(m_hwnd, &rc);
 
             D2D1_SIZE_U size = D2D1::SizeU(rc.right, rc.bottom);
-
+            
             m_pRenderTarget->Resize(size);
-            CalculateLayout_Base();
+            CalculateLayout_Base(size);
             InvalidateRect(m_hwnd, NULL, FALSE);
         }
     }
@@ -361,12 +361,14 @@ protected:
     virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) { return DefWindowProc(m_hwnd, uMsg, wParam, lParam); };
     virtual HRESULT CreateGraphicsResources() { return S_OK; };
     virtual void DiscardGraphicsResources() {};
-    virtual void CalculateLayout() {};
+    virtual void CalculateLayout(D2D1_SIZE_U size) {};
     virtual HRESULT OnPaint() { return S_OK;  };
     virtual void OnDestroy() {};
 
+    // My D2D functions
     HRESULT MKEventSystem(UINT uMsg, WPARAM wParam, LPARAM lParam);     // Mouse and keyboard event system
                                                                         // Automatically distributes mouse and keyboard input to the correct objects
+
 
     HWND m_hwnd;
     const wchar_t* m_ClassName = L"Class Name";

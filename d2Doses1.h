@@ -73,7 +73,7 @@ namespace d2Doses1
 		brushType m_type = brushType::solid;
 	public:
 		brush();											// Default
-		ID2D1Brush* getPtr();						// Gets the 2d2 brush pointer
+		ID2D1Brush* getPtr();								// Gets the 2d2 brush pointer
 		virtual HRESULT create(ID2D1HwndRenderTarget*) = 0;	// Gets a value for the pointer		
 	};
 
@@ -149,6 +149,8 @@ namespace d2Doses1
 		object* m_parent;				// The parent of the object
 		dynArray<object*> m_children;	// The children of the object
 		bool m_enebled = 1;				// Is the object enabled
+		bool m_passive = 1;				// Passive objects only get events when mouse is over them
+										//	Non-Passive objects will always get all events
 
 		// Brushes
 		brushType m_useBrush = brushType::solid;
@@ -164,8 +166,11 @@ namespace d2Doses1
 		
 	public:
 
+		// General setters and getters
 		container* setContainer(container* Con);
 		container* getContainer();
+		bool isPassive();
+		void setPassivness();
 
 		// brush stuff
 		brushType getBrushType() { return m_useBrush; };

@@ -1,7 +1,7 @@
 // Button1
 
 dynArray<button1*> button1::sm_allButtons;
-bool button1::sm_onlyOne = 1;
+bool button1::sm_onlyOne = 0;
 
 HRESULT button1::EventFunction(MKEvent Event)
 {
@@ -9,13 +9,12 @@ HRESULT button1::EventFunction(MKEvent Event)
 	{
 	case mouseEvent::leftUp:
 		getContainer()->setCapture(nullptr);
-		if (sm_onlyOne)
+		if (sm_onlyOne && m_dragging == 0)
 		{
 			turnOffAllOthers(this);
 		}
 		if (m_depressed)
 		{
-			
 			move(0, -2);
 			swap();
 			m_depressed = 0;
@@ -109,6 +108,11 @@ void button1::setStatus(bool set)
 		getSolidBrush()->setColor(m_onColor);
 		m_active = 1;
 	}
+}
+
+bool button1::getStatus()
+{
+	return m_active;
 }
 
 button1::button1(float X, float Y) : rect(X,Y,50,40)

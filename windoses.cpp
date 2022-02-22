@@ -4,8 +4,7 @@ HRESULT D2DWindow<USER_CLASS>::MKEventSystem(UINT uMsg, WPARAM wParam, LPARAM lP
 	MKEvent e;
 	object* obj = nullptr;
 
-	//DC << uMsg << nll;
-
+	
 	switch (uMsg)
 	{
 	case WM_MOUSEMOVE:
@@ -48,9 +47,6 @@ HRESULT D2DWindow<USER_CLASS>::MKEventSystem(UINT uMsg, WPARAM wParam, LPARAM lP
 			}
 		}
 
-		//DC << L"Current: " << (int)obj << L"\n" << L"Last: " << (int)m_lastObject << L"\n";
-		//DC << e.cords.x << L", " << e.cords.y << L"\n";
-
 		m_lastObject = obj;
 		return 0;
 	}
@@ -59,8 +55,6 @@ HRESULT D2DWindow<USER_CLASS>::MKEventSystem(UINT uMsg, WPARAM wParam, LPARAM lP
 		e.cords.x = GET_X_LPARAM(lParam);
 		e.cords.y = GET_Y_LPARAM(lParam);
 		obj = m_con.getObjAtCord(e.cords.x, e.cords.y);
-		//DC << L"Current: " << (int)obj << L"\n" << L"Last: " << (int)m_lastObject << L"\n";
-		//DC << e.cords.x << L", " << e.cords.y << L"\n";
 		e.button = mouseEvent::leftDown;
 		if (obj)
 		{
@@ -74,19 +68,17 @@ HRESULT D2DWindow<USER_CLASS>::MKEventSystem(UINT uMsg, WPARAM wParam, LPARAM lP
 		e.cords.x = GET_X_LPARAM(lParam);
 		e.cords.y = GET_Y_LPARAM(lParam);
 		obj = m_con.getObjAtCord(e.cords.x, e.cords.y);
-		//DC << L"Current: " << (int)obj << L"\n" << L"Last: " << (int)m_lastObject << L"\n";
-		//DC << e.cords.x << L", " << e.cords.y << L"\n";
 		e.button = mouseEvent::leftUp;
-		if (obj) 
-		{ 
+		if (obj)
+		{
 			InvalidateRect(m_hwnd, NULL, FALSE);
-			return obj->EventFunction(e); 
+			return obj->EventFunction(e);
 		}
 		else return 0;
 	}
 	default:
 		break;
 	}
-
+	
 	return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
 }

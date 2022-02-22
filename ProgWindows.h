@@ -6,7 +6,9 @@ using namespace D2D1;
 
 class MainWindow : public D2DWindow<MainWindow>
 {
+	LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	HRESULT CreateGraphicsResources() override;
+	void CalculateLayout(D2D1_SIZE_U size) override;
 	HRESULT OnPaint() override;
 
 	button1 b1;
